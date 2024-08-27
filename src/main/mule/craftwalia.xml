@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="2934a905-8f02-448b-9b3e-e3f48550cfdc" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="craftwaliaFlow" doc:id="365caa84-718e-4410-9a51-5e28f2473d7c" >
+		<http:listener doc:name="Listener" doc:id="d352b5fe-0f60-4638-baee-6093138c9830" config-ref="HTTP_Listener_config" path="/craft"/>
+		<set-variable value="14" doc:name="Set Variable" doc:id="0418143c-1af9-4789-ad72-45252c40fe2d" variableName="age"/>
+		<choice doc:name="Choice" doc:id="0d11b8a4-57e1-4d4a-b774-1918236064ad" >
+			<when expression="#[vars.age &gt; 18]">
+				<ee:transform doc:name="Transform Message" doc:id="b09d1698-6041-40e0-8888-ef69fba77f2a" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"msg": "you are not allowed"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Transform Message" doc:id="ba277067-66a5-448f-8426-cece494c6c16" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"msg": "you are not allowed"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+	</flow>
+	<flow name="craftwaliaFlow1" doc:id="c74f021f-7c7e-4da6-8e3f-6818fe3b05b5" >
+		<http:listener doc:name="Listener" doc:id="b8c38bd3-a362-4255-a84a-3f3322bb8e1a" config-ref="HTTP_Listener_config" path="/walia"/>
+		<ee:transform doc:name="Transform Message" doc:id="d964b569-6b8d-4248-9b79-bb2d867ed9c4" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"msg": "another one"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="craftwaliaFlow2" doc:id="de91eaa5-9224-4538-bc42-b7559c67b962" >
+		<http:listener doc:name="Listener" doc:id="3191f6c7-8bd7-4697-aff1-b97c18391753" config-ref="HTTP_Listener_config" path="/another"/>
+		<ee:transform doc:name="Transform Message" doc:id="35b6479a-1d61-4c23-a95a-6d738182a882" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"msg": "craft software"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="craftwaliaFlow3" doc:id="ef404bc8-e555-4526-ba40-4d69f953fedf" >
+		<http:listener doc:name="Listener" doc:id="eb8e8b07-624b-4cd5-851c-5898f9120bd4" config-ref="HTTP_Listener_config" path="/something"/>
+		<until-successful maxRetries="5" doc:name="Until Successful" doc:id="2c2fbf3b-51e9-41f3-b029-7762ae401905" >
+			<http:request method="GET" doc:name="Request" doc:id="524363b9-242e-4205-b25e-45ff01f053f7" url="https://jsonplaceholder.typicode.com/posts" />
+		</until-successful>
+		<ee:transform doc:name="Transform Message" doc:id="a614cd40-b837-4ec2-9d07-24ed7bb0fb85" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
